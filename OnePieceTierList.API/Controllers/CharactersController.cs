@@ -2,11 +2,13 @@
 using Microsoft.EntityFrameworkCore;
 using OnePieceTierList.API.Data;
 using OnePieceTierList.API.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace OnePieceTierList.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CharactersController : ControllerBase
 {
     private readonly AppDbContext _context;
