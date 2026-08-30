@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { getCharacters } from "../services/api";
 import CharacterCard from "../components/CharacterCard";
+import TierRow from "../components/TierRow";
 
 function TierList() {
     const [characters, setCharacters] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const tiers = ["S", "A", "B", "C", "D"];
 
     useEffect(() => {
         const loadCharacters = async () => {
@@ -44,7 +47,21 @@ function TierList() {
 
             <h1>One Piece Tier List</h1>
 
-            <section>
+            {/* Tier Board */}
+            <section className="tier-board">
+
+                {tiers.map(tier => (
+                    <TierRow
+                        key={tier}
+                        tier={tier}
+                    />
+                ))}
+
+            </section>
+
+            {/* Character Pool */}
+            <section className="character-section">
+
                 <h2>Character Pool</h2>
 
                 <div className="character-pool">
@@ -57,6 +74,7 @@ function TierList() {
                     ))}
 
                 </div>
+
             </section>
 
         </div>
