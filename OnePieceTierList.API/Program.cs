@@ -8,8 +8,12 @@ using OnePieceTierList.API.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add controllers
-builder.Services.AddControllers();
-
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler =
+            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 // JWT Service
 builder.Services.AddScoped<JwtService>();
 
