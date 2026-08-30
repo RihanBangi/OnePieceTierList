@@ -33,12 +33,33 @@ function Login() {
             // Save JWT token
             localStorage.setItem("token", data.token);
 
+            // Save user's TierList ID
+            localStorage.setItem(
+                "tierListId",
+                data.tierListId.toString()
+            );
+
+            // Save user ID
+            localStorage.setItem(
+                "userId",
+                data.userId.toString()
+            );
+
+            // Save user name
+            localStorage.setItem(
+                "userName",
+                data.name
+            );
+
             setMessage("Login successful! ✅");
 
-            console.log("JWT Token:", data.token);
+            console.log("User:", data.name);
+            console.log("User ID:", data.userId);
+            console.log("TierList ID:", data.tierListId);
+
         } catch (error) {
-            setMessage("Could not connect to the API.");
             console.error(error);
+            setMessage("Could not connect to the API.");
         }
     };
 
@@ -47,6 +68,7 @@ function Login() {
             <h1>Login</h1>
 
             <form onSubmit={handleLogin}>
+
                 <div>
                     <label>Email</label>
                     <br />
@@ -54,7 +76,9 @@ function Login() {
                     <input
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) =>
+                            setEmail(e.target.value)
+                        }
                         placeholder="Enter email"
                         required
                     />
@@ -69,7 +93,9 @@ function Login() {
                     <input
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) =>
+                            setPassword(e.target.value)
+                        }
                         placeholder="Enter password"
                         required
                     />
@@ -80,6 +106,7 @@ function Login() {
                 <button type="submit">
                     Login
                 </button>
+
             </form>
 
             {message && <p>{message}</p>}

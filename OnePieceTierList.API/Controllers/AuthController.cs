@@ -13,7 +13,6 @@ namespace OnePieceTierList.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
-
     private readonly JwtService _jwtService;
 
     public AuthController(
@@ -24,6 +23,9 @@ public class AuthController : ControllerBase
         _jwtService = jwtService;
     }
 
+    // =========================
+    // REGISTER
+    // =========================
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterDto dto)
     {
@@ -46,15 +48,30 @@ public class AuthController : ControllerBase
 
         await _context.SaveChangesAsync();
 
+        // Create TierList for the new user
+        var tierList = new TierList
+        {
+            UserId = user.Id,
+            Name = $"{user.Name}'s One Piece Tier List"
+        };
+
+        _context.TierLists.Add(tierList);
+
+        await _context.SaveChangesAsync();
+
         return Ok(new
         {
             message = "Registration successful.",
             userId = user.Id,
             name = user.Name,
-            email = user.Email
+            email = user.Email,
+            tierListId = tierList.Id
         });
     }
 
+    // =========================
+    // LOGIN
+    // =========================
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto dto)
     {
@@ -71,7 +88,8 @@ public class AuthController : ControllerBase
 
         var passwordValid = BCrypt.Net.BCrypt.Verify(
             dto.Password,
-            user.PasswordHash);
+            user.PasswordHash
+        );
 
         if (!passwordValid)
         {
@@ -81,6 +99,25 @@ public class AuthController : ControllerBase
             });
         }
 
+        // Find user's TierList
+        var tierList = await _context.TierLists
+            .FirstOrDefaultAsync(t => t.UserId == user.Id);
+
+        // Create one if the user doesn't have one
+        if (tierList == null)
+        {
+            tierList = new TierList
+            {
+                UserId = user.Id,
+                Name = $"{user.Name}'s One Piece Tier List"
+            };
+
+            _context.TierLists.Add(tierList);
+
+            await _context.SaveChangesAsync();
+        }
+
+        // Generate JWT
         var token = _jwtService.GenerateToken(user);
 
         return Ok(new
@@ -89,7 +126,8 @@ public class AuthController : ControllerBase
             token,
             userId = user.Id,
             name = user.Name,
-            email = user.Email
+            email = user.Email,
+            tierListId = tierList.Id
         });
     }
 }
