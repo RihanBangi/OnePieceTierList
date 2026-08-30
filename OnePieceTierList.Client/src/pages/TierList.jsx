@@ -1,14 +1,28 @@
 import { useEffect, useState } from "react";
+import {
+    DndContext,
+    DragOverlay
+} from "@dnd-kit/core";
+
 import { getCharacters } from "../services/api";
 import CharacterCard from "../components/CharacterCard";
 import TierRow from "../components/TierRow";
 
 function TierList() {
     const [characters, setCharacters] = useState([]);
+
+    const [tiers, setTiers] = useState({
+        S: [],
+        A: [],
+        B: [],
+        C: [],
+        D: []
+    });
+
+    const [activeCharacter, setActiveCharacter] = useState(null);
+
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
-
-    const tiers = ["S", "A", "B", "C", "D"];
 
     useEffect(() => {
         const loadCharacters = async () => {
@@ -34,6 +48,71 @@ function TierList() {
         loadCharacters();
     }, []);
 
+    const handleDragStart = (event) => {
+        const characterId = Number(
+            event.active.id.toString().replace("character-", "")
+        );
+
+        const character = characters.find(
+            c => c.id === characterId
+        );
+
+        setActiveCharacter(character);
+    };
+
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+
+        setActiveCharacter(null);
+
+        if (!over) {
+            return;
+        }
+
+        const characterId = Number(
+            active.id.toString().replace("character-", "")
+        );
+
+        const overId = over.id.toString();
+
+        if (!overId.startsWith("tier-")) {
+            return;
+        }
+
+        const tier = overId.replace("tier-", "");
+
+        setTiers(previousTiers => {
+
+            const updatedTiers = {
+                S: previousTiers.S.filter(
+                    c => c.id !== characterId
+                ),
+                A: previousTiers.A.filter(
+                    c => c.id !== characterId
+                ),
+                B: previousTiers.B.filter(
+                    c => c.id !== characterId
+                ),
+                C: previousTiers.C.filter(
+                    c => c.id !== characterId
+                ),
+                D: previousTiers.D.filter(
+                    c => c.id !== characterId
+                )
+            };
+
+            const character = characters.find(
+                c => c.id === characterId
+            );
+
+            if (character && updatedTiers[tier]) {
+                updatedTiers[tier].push(character);
+            }
+
+            return updatedTiers;
+        });
+    };
+
     if (loading) {
         return <h2>Loading characters...</h2>;
     }
@@ -42,42 +121,74 @@ function TierList() {
         return <h2>{error}</h2>;
     }
 
+    const rankedCharacters = Object.values(tiers)
+        .flat()
+        .map(character => character.id);
+
+    const availableCharacters = characters.filter(
+        character => !rankedCharacters.includes(character.id)
+    );
+
     return (
-        <div className="tier-list-page">
+        <DndContext
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+        >
 
-            <h1>One Piece Tier List</h1>
+            <div className="tier-list-page">
 
-            {/* Tier Board */}
-            <section className="tier-board">
+                <h1>One Piece Tier List</h1>
 
-                {tiers.map(tier => (
-                    <TierRow
-                        key={tier}
-                        tier={tier}
-                    />
-                ))}
+                {/* Tier Board */}
+                <section className="tier-board">
 
-            </section>
-
-            {/* Character Pool */}
-            <section className="character-section">
-
-                <h2>Character Pool</h2>
-
-                <div className="character-pool">
-
-                    {characters.map(character => (
-                        <CharacterCard
-                            key={character.id}
-                            character={character}
-                        />
+                    {Object.keys(tiers).map(tier => (
+                        <TierRow
+                            key={tier}
+                            tier={tier}
+                        >
+                            {tiers[tier].map(character => (
+                                <CharacterCard
+                                    key={character.id}
+                                    character={character}
+                                />
+                            ))}
+                        </TierRow>
                     ))}
 
-                </div>
+                </section>
 
-            </section>
+                {/* Character Pool */}
+                <section className="character-section">
 
-        </div>
+                    <h2>Character Pool</h2>
+
+                    <div className="character-pool">
+
+                        {availableCharacters.map(character => (
+                            <CharacterCard
+                                key={character.id}
+                                character={character}
+                            />
+                        ))}
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            {/* Character being dragged */}
+            <DragOverlay>
+                {activeCharacter ? (
+                    <CharacterCard
+                        character={activeCharacter}
+                        isOverlay={true}
+                    />
+                ) : null}
+            </DragOverlay>
+
+        </DndContext>
     );
 }
 

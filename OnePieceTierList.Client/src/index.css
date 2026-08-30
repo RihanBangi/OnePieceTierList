@@ -63,3 +63,33 @@
 .character-section {
     margin-top: 20px;
 }
+.tier-characters {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 15px;
+    min-height: 130px;
+}
+
+.tier-over {
+    background: #e8f4ff;
+}
+
+.tier-characters .character-card {
+    width: 140px;
+}
+
+    .tier-characters .character-card img {
+        height: 100px;
+    }
+
+.character-card {
+    cursor: grab;
+    user-select: none;
+}
+
+    .character-card:active {
+        cursor: grabbing;
+    }
