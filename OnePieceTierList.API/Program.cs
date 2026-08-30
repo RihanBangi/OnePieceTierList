@@ -6,6 +6,16 @@ using System.Text;
 using OnePieceTierList.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactPolicy", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 // Add controllers
 builder.Services.AddControllers()
@@ -49,6 +59,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+app.UseCors("ReactPolicy");
 
 // Authentication MUST come before Authorization
 app.UseAuthentication();
