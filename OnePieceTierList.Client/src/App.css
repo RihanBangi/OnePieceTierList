@@ -5,3 +5,115 @@
 .app {
     min-height: 100vh;
 }
+
+.tier-list-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+    .tier-list-page h1 {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+.tier-board {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.tier-row {
+    display: flex;
+    min-height: 130px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+}
+
+.tier-row-over {
+    border: 2px solid #333;
+}
+
+.tier-label {
+    width: 90px;
+    min-width: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.tier-S {
+    background: #ff6b6b;
+}
+
+.tier-A {
+    background: #ffa94d;
+}
+
+.tier-B {
+    background: #ffd43b;
+}
+
+.tier-C {
+    background: #69db7c;
+}
+
+.tier-D {
+    background: #74c0fc;
+}
+
+.tier-characters {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 15px;
+    align-items: center;
+}
+
+.character-section {
+    margin-top: 40px;
+}
+
+    .character-section h2 {
+        margin-bottom: 15px;
+    }
+
+.character-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 20px;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    min-height: 150px;
+}
+
+.character-card {
+    width: 110px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    user-select: none;
+}
+
+    .character-card img {
+        width: 110px;
+        height: 120px;
+        object-fit: cover;
+        display: block;
+    }
+
+.character-name {
+    padding: 8px 5px;
+    font-size: 14px;
+    font-weight: bold;
+}

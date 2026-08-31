@@ -1,26 +1,22 @@
 import { useDroppable } from "@dnd-kit/core";
 
 function TierRow({ tier, children }) {
-
-    const { setNodeRef, isOver } = useDroppable({
+    const { isOver, setNodeRef } = useDroppable({
         id: `tier-${tier}`
     });
 
     return (
-        <div className="tier-row">
-
-            <div className="tier-label">
+        <div
+            ref={setNodeRef}
+            className={`tier-row ${isOver ? "tier-row-over" : ""}`}
+        >
+            <div className={`tier-label tier-${tier}`}>
                 {tier}
             </div>
 
-            <div
-                ref={setNodeRef}
-                className={`tier-characters ${isOver ? "tier-over" : ""
-                    }`}
-            >
+            <div className="tier-characters">
                 {children}
             </div>
-
         </div>
     );
 }
