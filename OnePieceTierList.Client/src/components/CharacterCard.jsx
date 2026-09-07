@@ -12,18 +12,20 @@ function CharacterCard({ character, isOverlay = false }) {
         disabled: isOverlay
     });
 
-    const style = {
-        transform: CSS.Translate.toString(transform),
-        cursor: isOverlay ? "grabbing" : "grab"
-    };
+    const style = isOverlay
+        ? {}
+        : {
+            transform: CSS.Translate.toString(transform),
+            cursor: "grab"
+        };
 
     return (
         <div
             ref={isOverlay ? undefined : setNodeRef}
             style={style}
             className="character-card"
-            {...(isOverlay ? {} : listeners)}
             {...(isOverlay ? {} : attributes)}
+            {...(isOverlay ? {} : listeners)}
         >
             <img
                 src={character.imageUrl}

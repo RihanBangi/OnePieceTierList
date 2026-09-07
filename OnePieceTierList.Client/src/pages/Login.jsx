@@ -1,12 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+
+        if (token) {
+            navigate("/tier-list", { replace: true });
+        }
+    }, [navigate]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
+
+        setMessage("");
+        setLoading(true);
 
         try {
             const response = await fetch(
@@ -17,8 +32,8 @@ function Login() {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        email: email,
-                        password: password
+                        email,
+                        password
                     })
                 }
             );
@@ -26,90 +41,94 @@ function Login() {
             const data = await response.json();
 
             if (!response.ok) {
-                setMessage(data.message || "Login failed");
+                setMessage(data.message || "Login failed.");
                 return;
             }
 
-            // Save JWT token
+            // Save authentication information
             localStorage.setItem("token", data.token);
+            localStorage.setItem("userId", data.userId);
+            localStorage.setItem("tierListId", data.tierListId);
+            localStorage.setItem("userName", data.name);
+            localStorage.setItem("userEmail", data.email);
 
-            // Save user's TierList ID
-            localStorage.setItem(
-                "tierListId",
-                data.tierListId.toString()
-            );
-
-            // Save user ID
-            localStorage.setItem(
-                "userId",
-                data.userId.toString()
-            );
-
-            // Save user name
-            localStorage.setItem(
-                "userName",
-                data.name
-            );
-
-            setMessage("Login successful! ✅");
-
-            console.log("User:", data.name);
-            console.log("User ID:", data.userId);
-            console.log("TierList ID:", data.tierListId);
+            // Go to tier list
+            navigate("/tier-list", { replace: true });
 
         } catch (error) {
             console.error(error);
             setMessage("Could not connect to the API.");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div>
-            <h1>Login</h1>
+        <div className="auth-page">
 
-            <form onSubmit={handleLogin}>
+            <div className="auth-card">
 
-                <div>
-                    <label>Email</label>
-                    <br />
-
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) =>
-                            setEmail(e.target.value)
-                        }
-                        placeholder="Enter email"
-                        required
-                    />
+                <div className="auth-icon">
+                    🏴‍☠️
                 </div>
 
-                <br />
+                <h1>Welcome Back!</h1>
 
-                <div>
-                    <label>Password</label>
-                    <br />
+                <p className="auth-subtitle">
+                    Login to your One Piece Tier List
+                </p>
 
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) =>
-                            setPassword(e.target.value)
-                        }
-                        placeholder="Enter password"
-                        required
-                    />
-                </div>
+                <form onSubmit={handleLogin}>
 
-                <br />
+                    <div className="form-group">
+                        <label>Email</label>
 
-                <button type="submit">
-                    Login
-                </button>
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Enter your email"
+                            required
+                        />
+                    </div>
 
-            </form>
+                    <div className="form-group">
+                        <label>Password</label>
 
-            {message && <p>{message}</p>}
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter your password"
+                            required
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="auth-button"
+                        disabled={loading}
+                    >
+                        {loading ? "Logging in..." : "Login"}
+                    </button>
+
+                </form>
+
+                {message && (
+                    <p className="auth-message">
+                        {message}
+                    </p>
+                )}
+
+                <p className="auth-switch">
+                    Don't have an account?{" "}
+                    <Link to="/register">
+                        Register
+                    </Link>
+                </p>
+
+            </div>
+
         </div>
     );
 }

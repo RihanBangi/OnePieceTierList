@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import "./App.css";
 
 import Navbar from "./components/Navbar";
 import Login from "./pages/Login";
@@ -18,11 +19,9 @@ function ProtectedRoute({ children }) {
 function App() {
     return (
         <BrowserRouter>
-
             <Navbar />
 
             <Routes>
-
                 <Route
                     path="/"
                     element={<Navigate to="/tier-list" replace />}
@@ -46,9 +45,7 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-
             </Routes>
-
         </BrowserRouter>
     );
 }

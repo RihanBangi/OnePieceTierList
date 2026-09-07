@@ -1,23 +1,40 @@
 const API_URL = "http://localhost:5000/api";
 
+// ===============================
+// GET CHARACTERS
+// ===============================
+
 export async function getCharacters(token) {
-    const response = await fetch(`${API_URL}/characters`, {
-        method: "GET",
-        headers: {
-            Authorization: `Bearer ${token}`
+    const response = await fetch(
+        `${API_URL}/characters`,
+        {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
         }
-    });
+    );
 
     if (!response.ok) {
+        const errorText = await response.text();
+
         throw new Error(
-            `Failed to load characters: ${response.status}`
+            `Failed to load characters: ${response.status} ${errorText}`
         );
     }
 
     return await response.json();
 }
 
-export async function getTierListItems(tierListId, token) {
+
+// ===============================
+// GET TIER LIST ITEMS
+// ===============================
+
+export async function getTierListItems(
+    tierListId,
+    token
+) {
     const response = await fetch(
         `${API_URL}/tierlists/${tierListId}/items`,
         {
@@ -39,6 +56,11 @@ export async function getTierListItems(tierListId, token) {
     return await response.json();
 }
 
+
+// ===============================
+// ADD TIER LIST ITEM
+// ===============================
+
 export async function addTierListItem(
     tierListId,
     characterId,
@@ -50,10 +72,12 @@ export async function addTierListItem(
         `${API_URL}/tierlists/${tierListId}/items`,
         {
             method: "POST",
+
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`
             },
+
             body: JSON.stringify({
                 characterId,
                 tier,
@@ -73,6 +97,11 @@ export async function addTierListItem(
     return await response.json();
 }
 
+
+// ===============================
+// UPDATE TIER LIST ITEM
+// ===============================
+
 export async function updateTierListItem(
     tierListId,
     itemId,
@@ -84,10 +113,12 @@ export async function updateTierListItem(
         `${API_URL}/tierlists/${tierListId}/items/${itemId}`,
         {
             method: "PUT",
+
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`
             },
+
             body: JSON.stringify({
                 tier,
                 position
@@ -106,6 +137,11 @@ export async function updateTierListItem(
     return await response.json();
 }
 
+
+// ===============================
+// DELETE TIER LIST ITEM
+// ===============================
+
 export async function deleteTierListItem(
     tierListId,
     itemId,
@@ -115,6 +151,7 @@ export async function deleteTierListItem(
         `${API_URL}/tierlists/${tierListId}/items/${itemId}`,
         {
             method: "DELETE",
+
             headers: {
                 Authorization: `Bearer ${token}`
             }

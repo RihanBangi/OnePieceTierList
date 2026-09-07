@@ -1,21 +1,181 @@
 #root {
-    width: 100%;
-}
-
-.app {
     min-height: 100vh;
 }
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar {
+    height: 70px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #111827;
+    color: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 21px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.welcome-text {
+    font-size: 15px;
+}
+
+.logout-button {
+    padding: 9px 18px;
+    border: none;
+    border-radius: 7px;
+    background: white;
+    color: #111827;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .logout-button:hover {
+        opacity: 0.85;
+    }
+
+
+/* =========================
+   LOGIN / REGISTER
+========================= */
+
+.auth-page {
+    min-height: calc(100vh - 70px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background: #f3f4f6;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.auth-icon {
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.auth-card h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+}
+
+.auth-subtitle {
+    margin: 0 0 30px;
+    color: #6b7280;
+}
+
+.form-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+    .form-group label {
+        display: block;
+        margin-bottom: 7px;
+        font-weight: 600;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        outline: none;
+        font-size: 15px;
+    }
+
+        .form-group input:focus {
+            border-color: #111827;
+        }
+
+.auth-button {
+    width: 100%;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    background: #111827;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+    .auth-button:hover {
+        background: #374151;
+    }
+
+    .auth-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+.auth-message {
+    margin-top: 18px;
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.auth-switch {
+    margin-top: 25px;
+    color: #6b7280;
+}
+
+    .auth-switch a {
+        color: #111827;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+
+/* =========================
+   TIER LIST PAGE
+========================= */
 
 .tier-list-page {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 30px;
+    padding: 40px 25px;
 }
 
-    .tier-list-page h1 {
+    .tier-list-page > h1 {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 35px;
+        font-size: 36px;
     }
+
+
+/* =========================
+   TIER BOARD
+========================= */
 
 .tier-board {
     display: flex;
@@ -23,18 +183,31 @@
     gap: 10px;
 }
 
+
+/* =========================
+   TIER ROW
+========================= */
+
 .tier-row {
     display: flex;
     min-height: 130px;
-    border: 2px solid #ddd;
+    background: white;
+    border: 2px solid #e5e7eb;
     border-radius: 10px;
     overflow: hidden;
-    background: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: 0.2s ease;
 }
 
 .tier-row-over {
-    border: 2px solid #333;
+    border-color: #111827;
+    box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.08);
 }
+
+
+/* =========================
+   TIER LABEL
+========================= */
 
 .tier-label {
     width: 90px;
@@ -43,37 +216,52 @@
     align-items: center;
     justify-content: center;
     font-size: 32px;
-    font-weight: bold;
+    font-weight: 800;
+    color: #111827;
 }
 
+
+/* Tier colors */
+
 .tier-S {
-    background: #ff6b6b;
+    background: #ef4444;
 }
 
 .tier-A {
-    background: #ffa94d;
+    background: #f97316;
 }
 
 .tier-B {
-    background: #ffd43b;
+    background: #facc15;
 }
 
 .tier-C {
-    background: #69db7c;
+    background: #4ade80;
 }
 
 .tier-D {
-    background: #74c0fc;
+    background: #60a5fa;
 }
+
+
+/* =========================
+   CHARACTERS INSIDE TIER
+========================= */
 
 .tier-characters {
     flex: 1;
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    align-items: flex-start;
+    gap: 12px;
     padding: 15px;
-    align-items: center;
+    min-height: 126px;
 }
+
+
+/* =========================
+   CHARACTER POOL
+========================= */
 
 .character-section {
     margin-top: 40px;
@@ -83,27 +271,32 @@
         margin-bottom: 15px;
     }
 
-.character-pool {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    padding: 20px;
-    background: white;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    min-height: 150px;
-}
+
+/* =========================
+   CHARACTER CARD
+========================= */
 
 .character-card {
     width: 110px;
     background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
     overflow: hidden;
     text-align: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
     user-select: none;
+    cursor: grab;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+
+    .character-card:active {
+        cursor: grabbing;
+    }
+
+    .character-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+    }
 
     .character-card img {
         width: 110px;
@@ -113,7 +306,88 @@
     }
 
 .character-name {
-    padding: 8px 5px;
-    font-size: 14px;
-    font-weight: bold;
+    padding: 9px 5px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+
+/* =========================
+   DRAG OVERLAY
+========================= */
+
+.character-card[style] {
+    cursor: grabbing;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 700px) {
+
+    .navbar {
+        padding: 0 15px;
+    }
+
+    .navbar-logo span {
+        display: none;
+    }
+
+    .welcome-text {
+        display: none;
+    }
+
+    .tier-list-page {
+        padding: 25px 10px;
+    }
+
+        .tier-list-page > h1 {
+            font-size: 28px;
+        }
+
+    .tier-label {
+        width: 65px;
+        min-width: 65px;
+        font-size: 25px;
+    }
+
+    .tier-characters {
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .character-card {
+        width: 90px;
+    }
+
+        .character-card img {
+            width: 90px;
+            height: 100px;
+        }
+
+    .auth-card {
+        padding: 30px 20px;
+    }
+}
+.character-pool {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    min-height: 250px;
+    padding: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 15px;
+    background: white;
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+}
+
+.character-pool-over {
+    border: 3px dashed #111827;
+    background: #f3f4f6;
 }
