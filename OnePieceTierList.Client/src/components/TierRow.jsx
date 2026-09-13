@@ -8,7 +8,8 @@ function TierRow({ tier, children }) {
     return (
         <div
             ref={setNodeRef}
-            className={`tier-row ${isOver ? "tier-row-over" : ""}`}
+            className={`tier-row ${isOver ? "tier-row-over" : ""
+                }`}
         >
             <div className={`tier-label tier-${tier}`}>
                 {tier}

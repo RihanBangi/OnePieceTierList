@@ -2,30 +2,27 @@ import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 
 function CharacterCard({ character, isOverlay = false }) {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform
-    } = useDraggable({
-        id: `character-${character.id}`,
-        disabled: isOverlay
-    });
+    const { attributes, listeners, setNodeRef, transform, isDragging } =
+        useDraggable({
+            id: `character-${character.id}`,
+            disabled: isOverlay,
+        });
 
     const style = isOverlay
         ? {}
         : {
             transform: CSS.Translate.toString(transform),
-            cursor: "grab"
+            opacity: isDragging ? 0.5 : 1,
+            cursor: "grab",
         };
 
     return (
         <div
-            ref={isOverlay ? undefined : setNodeRef}
+            ref={setNodeRef}
             style={style}
             className="character-card"
-            {...(isOverlay ? {} : attributes)}
-            {...(isOverlay ? {} : listeners)}
+            {...(!isOverlay ? listeners : {})}
+            {...(!isOverlay ? attributes : {})}
         >
             <img
                 src={character.imageUrl}

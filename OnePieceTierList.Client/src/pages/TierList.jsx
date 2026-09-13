@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+
 import {
     DndContext,
     DragOverlay,
     useDroppable,
+    closestCenter
 } from "@dnd-kit/core";
 
 import {
@@ -10,7 +12,7 @@ import {
     getTierListItems,
     addTierListItem,
     updateTierListItem,
-    deleteTierListItem,
+    deleteTierListItem
 } from "../services/api";
 
 import CharacterCard from "../components/CharacterCard";
@@ -21,7 +23,7 @@ const INITIAL_TIERS = {
     A: [],
     B: [],
     C: [],
-    D: [],
+    D: []
 };
 
 function TierList() {
@@ -32,14 +34,14 @@ function TierList() {
     const [error, setError] = useState("");
 
     // =========================
-    // CHARACTER POOL DROP ZONE
+    // CHARACTER POOL
     // =========================
 
     const {
         isOver: isPoolOver,
-        setNodeRef: setPoolNodeRef,
+        setNodeRef: setPoolNodeRef
     } = useDroppable({
-        id: "character-pool",
+        id: "character-pool"
     });
 
     // =========================
@@ -50,11 +52,10 @@ function TierList() {
         const loadData = async () => {
             try {
                 const token = localStorage.getItem("token");
+
                 const tierListId = Number(
                     localStorage.getItem("tierListId")
                 );
-
-                console.log("Loading Tier List ID:", tierListId);
 
                 if (!token) {
                     setError("You are not logged in.");
@@ -72,7 +73,7 @@ function TierList() {
                         getTierListItems(
                             tierListId,
                             token
-                        ),
+                        )
                     ]);
 
                 setCharacters(characterData);
@@ -82,7 +83,7 @@ function TierList() {
                     A: [],
                     B: [],
                     C: [],
-                    D: [],
+                    D: []
                 };
 
                 tierItems.forEach((item) => {
@@ -92,11 +93,8 @@ function TierList() {
                     ) {
                         loadedTiers[item.tier].push({
                             ...item.character,
-
                             tierItemId: item.id,
-
-                            position:
-                                item.position ?? 0,
+                            position: item.position ?? 0
                         });
                     }
                 });
@@ -153,7 +151,7 @@ function TierList() {
     };
 
     // =========================
-    // FIND CHARACTER'S CURRENT TIER
+    // FIND CHARACTER
     // =========================
 
     const findCharacterInTiers = (
@@ -168,12 +166,44 @@ function TierList() {
             if (character) {
                 return {
                     tier,
-                    character,
+                    character
                 };
             }
         }
 
         return null;
+    };
+
+    // =========================
+    // SAVE TIER POSITIONS
+    // =========================
+
+    const saveTierPositions = async (
+        tierName,
+        tierCharacters,
+        token,
+        tierListId
+    ) => {
+        for (
+            let index = 0;
+            index < tierCharacters.length;
+            index++
+        ) {
+            const character =
+                tierCharacters[index];
+
+            if (!character.tierItemId) {
+                continue;
+            }
+
+            await updateTierListItem(
+                tierListId,
+                character.tierItemId,
+                tierName,
+                index,
+                token
+            );
+        }
     };
 
     // =========================
@@ -199,14 +229,12 @@ function TierList() {
             localStorage.getItem("token");
 
         const tierListId = Number(
-            localStorage.getItem("tierListId")
+            localStorage.getItem(
+                "tierListId"
+            )
         );
 
         if (!token || !tierListId) {
-            console.error(
-                "Missing token or tier list ID."
-            );
-
             return;
         }
 
@@ -220,8 +248,7 @@ function TierList() {
         }
 
         // ==================================================
-        // IMPORTANT:
-        // CHECK CHARACTER POOL USING ITS REAL DOM RECTANGLE
+        // CHARACTER POOL DETECTION
         // ==================================================
 
         const poolElement =
@@ -231,86 +258,72 @@ function TierList() {
 
         let droppedInsidePool = false;
 
-        if (poolElement) {
+        if (
+            poolElement &&
+            active.rect.current.translated
+        ) {
             const poolRect =
                 poolElement.getBoundingClientRect();
 
             const draggedRect =
                 active.rect.current.translated;
 
-            if (draggedRect) {
-                const centerX =
-                    draggedRect.left +
-                    draggedRect.width / 2;
+            const centerX =
+                draggedRect.left +
+                draggedRect.width / 2;
 
-                const centerY =
-                    draggedRect.top +
-                    draggedRect.height / 2;
+            const centerY =
+                draggedRect.top +
+                draggedRect.height / 2;
 
-                droppedInsidePool =
-                    centerX >= poolRect.left &&
-                    centerX <= poolRect.right &&
-                    centerY >= poolRect.top &&
-                    centerY <= poolRect.bottom;
-            }
+            droppedInsidePool =
+                centerX >= poolRect.left &&
+                centerX <= poolRect.right &&
+                centerY >= poolRect.top &&
+                centerY <= poolRect.bottom;
         }
 
+        const overId = over
+            ? over.id.toString()
+            : "";
+
         // ==================================================
-        // CASE 1
-        // CHARACTER DROPPED INTO CHARACTER POOL
+        // CASE 1: CHARACTER POOL
         // ==================================================
 
         if (
             droppedInsidePool ||
-            over?.id === "character-pool"
+            overId === "character-pool"
         ) {
-            console.log(
-                "Dropped on: character-pool"
-            );
-
             const existing =
                 findCharacterInTiers(
                     characterId
                 );
 
             if (!existing) {
-                console.log(
-                    `${character.name} is already in pool`
-                );
-
                 return;
             }
 
             const tierItem =
                 existing.character;
 
-            // Remove from UI immediately
             setTiers((previousTiers) => {
-                const updated = {
-                    S: [],
-                    A: [],
-                    B: [],
-                    C: [],
-                    D: [],
-                };
+                const updated = {};
 
-                Object.keys(
-                    previousTiers
-                ).forEach((tier) => {
-                    updated[tier] =
-                        previousTiers[
-                            tier
-                        ].filter(
-                            (c) =>
-                                c.id !==
-                                characterId
-                        );
-                });
+                Object.keys(previousTiers).forEach(
+                    (tier) => {
+                        updated[tier] =
+                            previousTiers[tier].filter(
+                                (c) =>
+                                    c.id !==
+                                    characterId
+                            );
+                    }
+                );
 
                 return updated;
             });
 
-            // Delete from database
             if (tierItem.tierItemId) {
                 try {
                     await deleteTierListItem(
@@ -318,14 +331,9 @@ function TierList() {
                         tierItem.tierItemId,
                         token
                     );
-
-                    console.log(
-                        `${character.name} returned to Character Pool`
-                    );
-
                 } catch (err) {
                     console.error(
-                        "Failed to remove character from backend:",
+                        "Failed to delete tier item:",
                         err
                     );
                 }
@@ -334,29 +342,34 @@ function TierList() {
             return;
         }
 
-        // ==================================================
-        // NO DROP TARGET
-        // ==================================================
-
         if (!over) {
-            console.log(
-                "Character was not dropped on a valid target."
-            );
-
             return;
         }
 
-        const overId =
-            over.id.toString();
+        // ==================================================
+        // CASE 2: DROPPED ON ANOTHER CHARACTER
+        // ==================================================
 
-        console.log(
-            "Dropped on:",
-            overId
-        );
+        if (
+            overId.startsWith(
+                "character-drop-"
+            )
+        ) {
+            const targetCharacterId =
+                Number(
+                    overId.replace(
+                        "character-drop-",
+                        ""
+                    )
+                );
+
+            // This branch is currently not used
+            // because CharacterCard is only draggable.
+            return;
+        }
 
         // ==================================================
-        // CASE 2
-        // CHARACTER DROPPED INTO TIER
+        // CASE 3: DROPPED ON TIER
         // ==================================================
 
         if (
@@ -380,76 +393,171 @@ function TierList() {
                 characterId
             );
 
-        // Position at end of tier
-        const newPosition =
-            tiers[newTier].length;
-
         // ==================================================
-        // CASE 2A
-        // MOVE CHARACTER FROM ONE TIER TO ANOTHER
+        // EXISTING CHARACTER
         // ==================================================
 
         if (
             existing &&
             existing.character.tierItemId
         ) {
+            const oldTier =
+                existing.tier;
+
             const existingCharacter =
                 existing.character;
 
-            setTiers((previousTiers) => {
-                const updated = {
-                    S: [],
-                    A: [],
-                    B: [],
-                    C: [],
-                    D: [],
-                };
+            // Same tier
+            if (oldTier === newTier) {
+                const currentList =
+                    [...tiers[oldTier]];
 
-                Object.keys(
-                    previousTiers
-                ).forEach((tier) => {
-                    updated[tier] =
-                        previousTiers[
-                            tier
-                        ].filter(
-                            (c) =>
-                                c.id !==
-                                characterId
-                        );
-                });
+                const oldIndex =
+                    currentList.findIndex(
+                        (c) =>
+                            c.id ===
+                            characterId
+                    );
 
-                updated[newTier] = [
-                    ...updated[newTier],
-                    {
-                        ...existingCharacter,
+                if (oldIndex === -1) {
+                    return;
+                }
+
+                // Move character to end
+                const [
+                    movedCharacter
+                ] =
+                    currentList.splice(
+                        oldIndex,
+                        1
+                    );
+
+                currentList.push(
+                    movedCharacter
+                );
+
+                const updatedList =
+                    currentList.map(
+                        (
+                            item,
+                            index
+                        ) => ({
+                            ...item,
+                            position:
+                                index
+                        })
+                    );
+
+                setTiers(
+                    (previousTiers) => ({
+                        ...previousTiers,
+                        [newTier]:
+                            updatedList
+                    })
+                );
+
+                try {
+                    await saveTierPositions(
+                        newTier,
+                        updatedList,
+                        token,
+                        tierListId
+                    );
+
+                    console.log(
+                        "Tier order saved"
+                    );
+
+                } catch (err) {
+                    console.error(
+                        "Failed to save order:",
+                        err
+                    );
+                }
+
+                return;
+            }
+
+            // ==================================================
+            // MOVE TO DIFFERENT TIER
+            // ==================================================
+
+            const oldList =
+                tiers[oldTier].filter(
+                    (c) =>
+                        c.id !==
+                        characterId
+                );
+
+            const newList = [
+                ...tiers[newTier],
+                {
+                    ...existingCharacter
+                }
+            ];
+
+            const updatedOldList =
+                oldList.map(
+                    (
+                        item,
+                        index
+                    ) => ({
+                        ...item,
                         position:
-                            newPosition,
-                    },
-                ];
+                            index
+                    })
+                );
 
-                return updated;
-            });
+            const updatedNewList =
+                newList.map(
+                    (
+                        item,
+                        index
+                    ) => ({
+                        ...item,
+                        position:
+                            index
+                    })
+                );
+
+            setTiers(
+                (previousTiers) => ({
+                    ...previousTiers,
+
+                    [oldTier]:
+                        updatedOldList,
+
+                    [newTier]:
+                        updatedNewList
+                })
+            );
 
             try {
                 await updateTierListItem(
                     tierListId,
-
                     existingCharacter.tierItemId,
-
                     newTier,
-
-                    newPosition,
-
+                    updatedNewList.length - 1,
                     token
                 );
 
-                console.log(
-                    `${character.name} moved to ${newTier}`
+                await saveTierPositions(
+                    oldTier,
+                    updatedOldList,
+                    token,
+                    tierListId
+                );
+
+                await saveTierPositions(
+                    newTier,
+                    updatedNewList,
+                    token,
+                    tierListId
                 );
 
             } catch (err) {
                 console.error(
-                    "Failed to update tier item:",
+                    "Failed to move character:",
                     err
                 );
             }
@@ -458,95 +566,87 @@ function TierList() {
         }
 
         // ==================================================
-        // CASE 2B
-        // CHARACTER FROM POOL -> TIER
+        // CHARACTER FROM POOL → TIER
         // ==================================================
+
+        const newPosition =
+            tiers[newTier].length;
 
         const temporaryId =
             `temp-${Date.now()}`;
 
         const newCharacter = {
             ...character,
-
             tierItemId:
                 temporaryId,
-
             position:
-                newPosition,
+                newPosition
         };
 
-        // Optimistic UI update
-        setTiers((previousTiers) => ({
-            ...previousTiers,
+        setTiers(
+            (previousTiers) => ({
+                ...previousTiers,
 
-            [newTier]: [
-                ...previousTiers[
-                newTier
-                ],
-
-                newCharacter,
-            ],
-        }));
+                [newTier]: [
+                    ...previousTiers[
+                    newTier
+                    ],
+                    newCharacter
+                ]
+            })
+        );
 
         try {
             const savedItem =
                 await addTierListItem(
                     tierListId,
-
                     characterId,
-
                     newTier,
-
                     newPosition,
-
                     token
                 );
 
-            // Replace temporary ID
-            // with database ID
+            setTiers(
+                (previousTiers) => ({
+                    ...previousTiers,
 
-            setTiers((previousTiers) => ({
-                ...previousTiers,
-
-                [newTier]:
-                    previousTiers[
-                        newTier
-                    ].map((item) =>
-                        item.tierItemId ===
-                            temporaryId
-                            ? {
-                                ...item,
-
-                                tierItemId:
-                                    savedItem.id,
-                            }
-                            : item
-                    ),
-            }));
-
-            console.log(
-                `${character.name} moved to ${newTier}`
+                    [newTier]:
+                        previousTiers[
+                            newTier
+                        ].map(
+                            (item) =>
+                                item.tierItemId ===
+                                    temporaryId
+                                    ? {
+                                        ...item,
+                                        tierItemId:
+                                            savedItem.id
+                                    }
+                                    : item
+                        )
+                })
             );
 
         } catch (err) {
             console.error(
-                "Failed to save tier placement:",
+                "Failed to add character:",
                 err
             );
 
-            // Remove temporary character
-            setTiers((previousTiers) => ({
-                ...previousTiers,
+            setTiers(
+                (previousTiers) => ({
+                    ...previousTiers,
 
-                [newTier]:
-                    previousTiers[
-                        newTier
-                    ].filter(
-                        (item) =>
-                            item.tierItemId !==
-                            temporaryId
-                    ),
-            }));
+                    [newTier]:
+                        previousTiers[
+                            newTier
+                        ].filter(
+                            (item) =>
+                                item.tierItemId !==
+                                temporaryId
+                        )
+                })
+            );
         }
     };
 
@@ -564,10 +664,6 @@ function TierList() {
         );
     }
 
-    // =========================
-    // ERROR
-    // =========================
-
     if (error) {
         return (
             <div className="tier-list-page">
@@ -577,7 +673,7 @@ function TierList() {
     }
 
     // =========================
-    // FIND CHARACTERS IN POOL
+    // CHARACTER POOL
     // =========================
 
     const rankedCharacterIds =
@@ -604,6 +700,9 @@ function TierList() {
 
     return (
         <DndContext
+            collisionDetection={
+                closestCenter
+            }
             onDragStart={
                 handleDragStart
             }
@@ -617,10 +716,6 @@ function TierList() {
                     One Piece Tier List
                 </h1>
 
-                {/* =========================
-                    TIER BOARD
-                ========================= */}
-
                 <section className="tier-board">
 
                     {Object.keys(tiers).map(
@@ -629,12 +724,8 @@ function TierList() {
                                 key={tier}
                                 tier={tier}
                             >
-                                {tiers[
-                                    tier
-                                ].map(
-                                    (
-                                        character
-                                    ) => (
+                                {tiers[tier].map(
+                                    (character) => (
                                         <CharacterCard
                                             key={
                                                 character.id
@@ -650,10 +741,6 @@ function TierList() {
                     )}
 
                 </section>
-
-                {/* =========================
-                    CHARACTER POOL
-                ========================= */}
 
                 <section className="character-section">
 
@@ -673,7 +760,6 @@ function TierList() {
                             }`
                         }
                     >
-
                         {availableCharacters.map(
                             (character) => (
                                 <CharacterCard
@@ -686,16 +772,10 @@ function TierList() {
                                 />
                             )
                         )}
-
                     </div>
 
                 </section>
-
             </div>
-
-            {/* =========================
-                DRAG OVERLAY
-            ========================= */}
 
             <DragOverlay>
                 {activeCharacter ? (
