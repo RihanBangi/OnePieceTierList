@@ -1,6 +1,73 @@
 const API_URL = "http://localhost:5000/api";
 
 // ===============================
+// REGISTER
+// ===============================
+
+export async function registerUser(name, email, password) {
+    const response = await fetch(
+        `${API_URL}/auth/register`,
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                name,
+                email,
+                password
+            })
+        }
+    );
+
+    if (!response.ok) {
+        const errorText = await response.text();
+
+        throw new Error(
+            `Registration failed: ${response.status} ${errorText}`
+        );
+    }
+
+    return await response.json();
+}
+
+
+// ===============================
+// LOGIN
+// ===============================
+
+export async function loginUser(email, password) {
+    const response = await fetch(
+        `${API_URL}/auth/login`,
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                email,
+                password
+            })
+        }
+    );
+
+    if (!response.ok) {
+        const errorText = await response.text();
+
+        throw new Error(
+            `Login failed: ${response.status} ${errorText}`
+        );
+    }
+
+    return await response.json();
+}
+
+
+// ===============================
 // GET CHARACTERS
 // ===============================
 

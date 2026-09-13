@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { loginUser } from "../services/api";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -24,40 +25,51 @@ function Login() {
         setLoading(true);
 
         try {
-            const response = await fetch(
-                "http://localhost:5000/api/auth/login",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        email,
-                        password
-                    })
-                }
+            const data = await loginUser(
+                email,
+                password
             );
 
-            const data = await response.json();
+            // Save authentication information
+            localStorage.setItem(
+                "token",
+                data.token
+            );
 
-            if (!response.ok) {
-                setMessage(data.message || "Login failed.");
-                return;
+            localStorage.setItem(
+                "userId",
+                data.userId
+            );
+
+            localStorage.setItem(
+                "userName",
+                data.name
+            );
+
+            localStorage.setItem(
+                "userEmail",
+                data.email
+            );
+
+            // Save tierListId only if backend sends it
+            if (data.tierListId) {
+                localStorage.setItem(
+                    "tierListId",
+                    data.tierListId
+                );
             }
 
-            // Save authentication information
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("userId", data.userId);
-            localStorage.setItem("tierListId", data.tierListId);
-            localStorage.setItem("userName", data.name);
-            localStorage.setItem("userEmail", data.email);
-
             // Go to tier list
-            navigate("/tier-list", { replace: true });
+            navigate("/tier-list", {
+                replace: true
+            });
 
         } catch (error) {
             console.error(error);
-            setMessage("Could not connect to the API.");
+
+            setMessage(
+                error.message || "Login failed."
+            );
         } finally {
             setLoading(false);
         }
@@ -86,7 +98,9 @@ function Login() {
                         <input
                             type="email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) =>
+                                setEmail(e.target.value)
+                            }
                             placeholder="Enter your email"
                             required
                         />
@@ -98,7 +112,9 @@ function Login() {
                         <input
                             type="password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) =>
+                                setPassword(e.target.value)
+                            }
                             placeholder="Enter your password"
                             required
                         />
@@ -109,7 +125,9 @@ function Login() {
                         className="auth-button"
                         disabled={loading}
                     >
-                        {loading ? "Logging in..." : "Login"}
+                        {loading
+                            ? "Logging in..."
+                            : "Login"}
                     </button>
 
                 </form>

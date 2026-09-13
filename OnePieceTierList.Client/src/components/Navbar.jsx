@@ -20,6 +20,7 @@ function Navbar() {
         localStorage.removeItem("userId");
         localStorage.removeItem("userName");
         localStorage.removeItem("userEmail");
+        localStorage.removeItem("tierListId");
 
         navigate("/login", { replace: true });
     };

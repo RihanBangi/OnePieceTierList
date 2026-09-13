@@ -391,3 +391,41 @@
     border: 3px dashed #111827;
     background: #f3f4f6;
 }
+/* =========================
+   FOOTER
+========================= */
+
+.footer {
+    margin-top: 50px;
+    padding: 35px 20px 20px;
+    background: #111827;
+    color: white;
+    text-align: center;
+}
+
+.footer-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.footer-logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.footer p {
+    margin: 8px 0;
+    color: #d1d5db;
+}
+
+.footer-divider {
+    width: 80%;
+    height: 1px;
+    margin: 25px auto 15px;
+    background: #374151;
+}
+
+.footer-copyright {
+    font-size: 14px;
+}

@@ -1,104 +1,145 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from "../services/api";
 
 function Register() {
+    const navigate = useNavigate();
+
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleRegister = async (e) => {
         e.preventDefault();
 
+        setMessage("");
+        setLoading(true);
+
         try {
-            const response = await fetch(
-                "http://localhost:5000/api/auth/register",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        name: name,
-                        email: email,
-                        password: password
-                    })
-                }
+            const data = await registerUser(
+                name,
+                email,
+                password
             );
 
-            const data = await response.json();
+            // Save user information
+            localStorage.setItem("userId", data.userId);
+            localStorage.setItem("userName", data.name);
+            localStorage.setItem("userEmail", data.email);
+            localStorage.setItem("tierListId", data.tierListId);
 
-            if (!response.ok) {
-                setMessage(data.message || "Registration failed");
-                return;
-            }
+            setMessage("Account created successfully! ✅");
 
-            setMessage("Registration successful! ✅");
+            setTimeout(() => {
+                navigate("/login", { replace: true });
+            }, 1000);
 
-            setName("");
-            setEmail("");
-            setPassword("");
         } catch (error) {
             console.error(error);
-            setMessage("Could not connect to the API.");
+
+            setMessage(
+                error.message || "Registration failed."
+            );
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div>
-            <h1>Create Account</h1>
+        <div className="auth-page">
 
-            <form onSubmit={handleRegister}>
-                <div>
-                    <label>Name</label>
-                    <br />
+            <div className="auth-card">
 
-                    <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Enter your name"
-                        required
-                    />
+                {/* Pirate Icon */}
+                <div className="auth-icon">
+                    🏴‍☠️
                 </div>
 
-                <br />
+                <h1>Create Account</h1>
 
-                <div>
-                    <label>Email</label>
-                    <br />
+                <p className="auth-subtitle">
+                    Create your One Piece Tier List account
+                </p>
 
-                    <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your email"
-                        required
-                    />
-                </div>
+                <form onSubmit={handleRegister}>
 
-                <br />
+                    {/* Name */}
+                    <div className="form-group">
+                        <label>Name</label>
 
-                <div>
-                    <label>Password</label>
-                    <br />
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) =>
+                                setName(e.target.value)
+                            }
+                            placeholder="Enter your name"
+                            required
+                        />
+                    </div>
 
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Enter password"
-                        required
-                    />
-                </div>
+                    {/* Email */}
+                    <div className="form-group">
+                        <label>Email</label>
 
-                <br />
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) =>
+                                setEmail(e.target.value)
+                            }
+                            placeholder="Enter your email"
+                            required
+                        />
+                    </div>
 
-                <button type="submit">
-                    Register
-                </button>
-            </form>
+                    {/* Password */}
+                    <div className="form-group">
+                        <label>Password</label>
 
-            {message && <p>{message}</p>}
+                        <input
+                            type="password"
+                            value={password}
+                            onChange={(e) =>
+                                setPassword(e.target.value)
+                            }
+                            placeholder="Create a password"
+                            required
+                        />
+                    </div>
+
+                    {/* Register Button */}
+                    <button
+                        type="submit"
+                        className="auth-button"
+                        disabled={loading}
+                    >
+                        {loading
+                            ? "Creating Account..."
+                            : "Create Account"}
+                    </button>
+
+                </form>
+
+                {/* Message */}
+                {message && (
+                    <p className="auth-message">
+                        {message}
+                    </p>
+                )}
+
+                {/* Login Link */}
+                <p className="auth-switch">
+                    Already have an account?{" "}
+                    <Link to="/login">
+                        Login
+                    </Link>
+                </p>
+
+            </div>
+
         </div>
     );
 }
