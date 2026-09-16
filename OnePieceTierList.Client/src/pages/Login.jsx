@@ -5,7 +5,7 @@ import { loginUser } from "../services/api";
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
@@ -21,7 +21,6 @@ function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
 
-        setMessage("");
         setLoading(true);
 
         try {
@@ -30,28 +29,11 @@ function Login() {
                 password
             );
 
-            // Save authentication information
-            localStorage.setItem(
-                "token",
-                data.token
-            );
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("userId", data.userId);
+            localStorage.setItem("userName", data.name);
+            localStorage.setItem("userEmail", data.email);
 
-            localStorage.setItem(
-                "userId",
-                data.userId
-            );
-
-            localStorage.setItem(
-                "userName",
-                data.name
-            );
-
-            localStorage.setItem(
-                "userEmail",
-                data.email
-            );
-
-            // Save tierListId only if backend sends it
             if (data.tierListId) {
                 localStorage.setItem(
                     "tierListId",
@@ -59,17 +41,29 @@ function Login() {
                 );
             }
 
-            // Go to tier list
             navigate("/tier-list", {
-                replace: true
+                replace: true,
+                state: {
+                    alert: {
+                        message: "Login successful!",
+                        type: "success"
+                    }
+                }
             });
 
         } catch (error) {
             console.error(error);
 
-            setMessage(
-                error.message || "Login failed."
-            );
+            navigate("/login", {
+                replace: true,
+                state: {
+                    alert: {
+                        message: "Invalid email or password.",
+                        type: "error"
+                    }
+                }
+            });
+
         } finally {
             setLoading(false);
         }
@@ -77,12 +71,9 @@ function Login() {
 
     return (
         <div className="auth-page">
-
             <div className="auth-card">
 
-                <div className="auth-icon">
-                    🏴‍☠️
-                </div>
+                <div className="auth-icon">🏴‍☠️</div>
 
                 <h1>Welcome Back!</h1>
 
@@ -98,9 +89,7 @@ function Login() {
                         <input
                             type="email"
                             value={email}
-                            onChange={(e) =>
-                                setEmail(e.target.value)
-                            }
+                            onChange={(e) => setEmail(e.target.value)}
                             placeholder="Enter your email"
                             required
                         />
@@ -109,15 +98,30 @@ function Login() {
                     <div className="form-group">
                         <label>Password</label>
 
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) =>
-                                setPassword(e.target.value)
-                            }
-                            placeholder="Enter your password"
-                            required
-                        />
+                        <div className="password-input">
+                            <input
+                                type={
+                                    showPassword
+                                        ? "text"
+                                        : "password"
+                                }
+                                value={password}
+                                onChange={(e) =>
+                                    setPassword(e.target.value)
+                                }
+                                placeholder="Enter your password"
+                                required
+                            />
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setShowPassword(!showPassword)
+                                }
+                            >
+                                {showPassword ? "Hide" : "Show"}
+                            </button>
+                        </div>
                     </div>
 
                     <button
@@ -132,12 +136,6 @@ function Login() {
 
                 </form>
 
-                {message && (
-                    <p className="auth-message">
-                        {message}
-                    </p>
-                )}
-
                 <p className="auth-switch">
                     Don't have an account?{" "}
                     <Link to="/register">
@@ -146,7 +144,6 @@ function Login() {
                 </p>
 
             </div>
-
         </div>
     );
 }

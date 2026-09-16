@@ -429,3 +429,61 @@
 .footer-copyright {
     font-size: 14px;
 }
+.alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 280px;
+    max-width: 400px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    font-size: 15px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.alert-success {
+    background: #198754;
+    color: white;
+}
+
+.alert-error {
+    background: #dc3545;
+    color: white;
+}
+
+.alert button {
+    border: none;
+    background: transparent;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+.password-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+    .password-input input {
+        width: 100%;
+        padding-right: 70px;
+    }
+
+    .password-input button {
+        position: absolute;
+        right: 10px;
+        border: none;
+        background: transparent;
+        color: #333;
+        font-weight: 600;
+        cursor: pointer;
+    }

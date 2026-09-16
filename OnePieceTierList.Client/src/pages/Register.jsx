@@ -8,13 +8,12 @@ function Register() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleRegister = async (e) => {
         e.preventDefault();
 
-        setMessage("");
         setLoading(true);
 
         try {
@@ -24,24 +23,55 @@ function Register() {
                 password
             );
 
-            // Save user information
             localStorage.setItem("userId", data.userId);
             localStorage.setItem("userName", data.name);
             localStorage.setItem("userEmail", data.email);
             localStorage.setItem("tierListId", data.tierListId);
 
-            setMessage("Account created successfully! ✅");
-
-            setTimeout(() => {
-                navigate("/login", { replace: true });
-            }, 1000);
+            navigate("/login", {
+                replace: true,
+                state: {
+                    alert: {
+                        message: "Account created successfully!",
+                        type: "success"
+                    }
+                }
+            });
 
         } catch (error) {
             console.error(error);
 
-            setMessage(
-                error.message || "Registration failed."
-            );
+            let message = "Registration failed.";
+
+            try {
+                const errorText = error.message || "";
+                const jsonStart = errorText.indexOf("{");
+
+                if (jsonStart !== -1) {
+                    const jsonText =
+                        errorText.substring(jsonStart);
+
+                    const errorData =
+                        JSON.parse(jsonText);
+
+                    if (errorData.message) {
+                        message = errorData.message;
+                    }
+                }
+            } catch {
+                message = "Registration failed.";
+            }
+
+            navigate("/register", {
+                replace: true,
+                state: {
+                    alert: {
+                        message,
+                        type: "error"
+                    }
+                }
+            });
+
         } finally {
             setLoading(false);
         }
@@ -49,13 +79,9 @@ function Register() {
 
     return (
         <div className="auth-page">
-
             <div className="auth-card">
 
-                {/* Pirate Icon */}
-                <div className="auth-icon">
-                    🏴‍☠️
-                </div>
+                <div className="auth-icon">🏴‍☠️</div>
 
                 <h1>Create Account</h1>
 
@@ -65,7 +91,6 @@ function Register() {
 
                 <form onSubmit={handleRegister}>
 
-                    {/* Name */}
                     <div className="form-group">
                         <label>Name</label>
 
@@ -80,7 +105,6 @@ function Register() {
                         />
                     </div>
 
-                    {/* Email */}
                     <div className="form-group">
                         <label>Email</label>
 
@@ -95,22 +119,35 @@ function Register() {
                         />
                     </div>
 
-                    {/* Password */}
                     <div className="form-group">
                         <label>Password</label>
 
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(e) =>
-                                setPassword(e.target.value)
-                            }
-                            placeholder="Create a password"
-                            required
-                        />
+                        <div className="password-input">
+                            <input
+                                type={
+                                    showPassword
+                                        ? "text"
+                                        : "password"
+                                }
+                                value={password}
+                                onChange={(e) =>
+                                    setPassword(e.target.value)
+                                }
+                                placeholder="Create a password"
+                                required
+                            />
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setShowPassword(!showPassword)
+                                }
+                            >
+                                {showPassword ? "Hide" : "Show"}
+                            </button>
+                        </div>
                     </div>
 
-                    {/* Register Button */}
                     <button
                         type="submit"
                         className="auth-button"
@@ -123,14 +160,6 @@ function Register() {
 
                 </form>
 
-                {/* Message */}
-                {message && (
-                    <p className="auth-message">
-                        {message}
-                    </p>
-                )}
-
-                {/* Login Link */}
                 <p className="auth-switch">
                     Already have an account?{" "}
                     <Link to="/login">
@@ -139,7 +168,6 @@ function Register() {
                 </p>
 
             </div>
-
         </div>
     );
 }
